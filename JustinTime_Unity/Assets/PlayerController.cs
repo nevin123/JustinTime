@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour {
 
     public float gravity = -9.81f;
     public float horizontalDrag = -5;
+    public float groundDragMultiplier = 5;
 
     [Header("charging")]
     public Vector2 minChargeVelocity;
@@ -44,7 +45,6 @@ public class PlayerController : MonoBehaviour {
             InputUp(1);
         }
         
-
         //Do Charge
         if(isCharging) {
             chargeTimer += Time.deltaTime;
@@ -54,16 +54,19 @@ public class PlayerController : MonoBehaviour {
             }
         }
 
+        //Move
+        motor.Move(velocity * Time.deltaTime);
+
         //Apply Physics
         velocity.y += gravity * Time.deltaTime;
         
-        float velocityXDrag = -Mathf.Sign(velocity.x) * Mathf.Clamp01(Mathf.Abs(velocity.x)) * ((motor.collisions.below == true)?horizontalDrag*2:horizontalDrag);
-        velocity.x += velocityXDrag * Time.deltaTime;
+        if(motor.collisions.left || motor.collisions.right) {
+            velocity.x = 0;
+        } else {
+            float velocityXDrag = -Mathf.Sign(velocity.x) * Mathf.Clamp01(Mathf.Abs(velocity.x)) * ((motor.collisions.below == true)?horizontalDrag*groundDragMultiplier:horizontalDrag);
+            velocity.x += velocityXDrag * Time.deltaTime;
+        }
 
-        //Move
-        motor.Move(velocity, 0f);
-
-        //Velocity Reset
         if(motor.collisions.below || motor.collisions.above) {
             velocity.y = 0;
         }
@@ -100,7 +103,7 @@ public class PlayerController : MonoBehaviour {
                 Vector2 newVelocity = Vector2.Lerp(minChargeVelocity, maxChargeVelocity, chargeTimer/maxChargeTime);
                 newVelocity.x *= chargeDirection;
                 
-                velocity = newVelocity * Time.deltaTime;
+                velocity = newVelocity;
                 
                 chargeTimer = 0;
                 isCharging = false;

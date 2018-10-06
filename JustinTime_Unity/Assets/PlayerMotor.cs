@@ -6,15 +6,12 @@ public class PlayerMotor : RaycastController
 {
     public CollisionInfo collisions;
 
-    public void Move(Vector2 moveAmount, float input) {
+    public void Move(Vector2 moveAmount) {
         UpdateRaycastOrigins();
         collisions.Reset();
 
         HorizontalCollisions(ref moveAmount);
-
-        if(moveAmount.y != 0) {
-            VerticalCollisions(ref moveAmount);
-        }
+        VerticalCollisions(ref moveAmount);
 
         transform.Translate(moveAmount);
     }
@@ -28,11 +25,11 @@ public class PlayerMotor : RaycastController
             rayOrigin += Vector2.right * (verticalRaySpacing * i + moveAmount.x);
             RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.up * directionY, rayLength, collisionMask);
 
-            Debug.DrawRay(rayOrigin, Vector2.up * directionY, Color.red);
+            Debug.DrawRay(rayOrigin, Vector2.up * directionY * rayLength, Color.red);
 
             if(hit) {
                 moveAmount.y = (hit.distance - skinWidth) * directionY;
-                rayLength = hit.distance;
+                rayLength = hit.distance + skinWidth;
 
                 collisions.below = directionY == -1;
                 collisions.above = directionY == 1;
@@ -44,12 +41,6 @@ public class PlayerMotor : RaycastController
         float directionX = Mathf.Sign(moveAmount.x);
         float rayLength = Mathf.Abs(moveAmount.x) + skinWidth;
 
-        if(Mathf.Abs(moveAmount.x) < skinWidth) {
-            rayLength = skinWidth * 2;
-        }
-
-        Debug.Log("horizontalRays: " + directionX);
-
         for(int i = 0; i < horizontalRayCount; i++) {
             Vector2 rayOrigin = (directionX == -1)?raycastOrigins.bottomLeft:raycastOrigins.bottomRight;
             rayOrigin += Vector2.up * (horizontalRaySpacing * i);
@@ -59,7 +50,7 @@ public class PlayerMotor : RaycastController
 
             if(hit) {
                 moveAmount.x = (hit.distance - skinWidth) * directionX;
-                rayLength = hit.distance;
+                rayLength = hit.distance + skinWidth;
 
                 collisions.left = directionX == -1;
                 collisions.right = directionX == 1;
@@ -70,8 +61,6 @@ public class PlayerMotor : RaycastController
     public struct CollisionInfo {
         public bool above, below;
         public bool left, right;
-
-        public int faceDir;
 
         public void Reset() {
             above = below = false;
