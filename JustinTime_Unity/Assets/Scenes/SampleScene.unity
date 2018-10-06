@@ -443,6 +443,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gravity: -1
   horizontalDrag: 5
+  minChargeVelocity: {x: 10, y: 5}
+  maxChargeVelocity: {x: 25, y: 30}
+  maxChargeTime: 1
 --- !u!1 &1152796989
 GameObject:
   m_ObjectHideFlags: 0
