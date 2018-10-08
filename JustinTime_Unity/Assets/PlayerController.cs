@@ -115,4 +115,8 @@ public class PlayerController : MonoBehaviour {
             yield return null;
         }
     }
+
+    private void OnTriggerEnter2D(Collider2D other) {
+        Debug.Log(other.gameObject.name);    
+    }
 }
