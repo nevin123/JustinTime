@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour {
     
     Vector2 velocity;
 
+    [Header("Physics")]
     public float gravity = -9.81f;
     public float horizontalDrag = -5;
     public float groundDragMultiplier = 5;
@@ -16,6 +17,8 @@ public class PlayerController : MonoBehaviour {
     public Vector2 minChargeVelocity;
     public Vector2 maxChargeVelocity;
     public float maxChargeTime;
+
+    public AnimationCurve chargePower;
 
     bool isCharging = false;
     int chargeDirection = 0;
@@ -100,7 +103,8 @@ public class PlayerController : MonoBehaviour {
     IEnumerator Charge() {        
         while(isCharging == true) {
             if(motor.collisions.below) {
-                Vector2 newVelocity = Vector2.Lerp(minChargeVelocity, maxChargeVelocity, chargeTimer/maxChargeTime);
+                
+                Vector2 newVelocity = Vector2.Lerp(minChargeVelocity, maxChargeVelocity, chargePower.Evaluate(chargeTimer/maxChargeTime));
                 newVelocity.x *= chargeDirection;
                 
                 velocity = newVelocity;
@@ -117,6 +121,9 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void OnTriggerEnter2D(Collider2D other) {
-        Debug.Log(other.gameObject.name);    
+        if(other.gameObject.layer == LayerMask.NameToLayer("Throwable")) {
+
+            Debug.Log(other.gameObject.name);    
+        }
     }
 }
