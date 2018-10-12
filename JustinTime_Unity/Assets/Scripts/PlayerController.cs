@@ -15,6 +15,9 @@ public class PlayerController : MonoBehaviour {
     public float horizontalDrag = -5;
     public float groundDragMultiplier = 5;
 
+    [Header("Catching")]
+    public Transform handPosition;
+
     [Header("charging")]
     public Vector2 minChargeVelocity;
     public Vector2 maxChargeVelocity;
