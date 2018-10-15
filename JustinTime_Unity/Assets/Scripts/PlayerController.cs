@@ -16,7 +16,9 @@ public class PlayerController : MonoBehaviour {
     public float groundDragMultiplier = 5;
 
     [Header("Catching")]
-    public Transform handPosition;
+    public Transform handTransform;
+    [Range(0.2f, 3)]
+    public float catchRadius = 1;
 
     [Header("charging")]
     public Vector2 minChargeVelocity;
@@ -65,6 +67,7 @@ public class PlayerController : MonoBehaviour {
 
         //Move
         motor.Move(velocity * Time.deltaTime);
+        CheckCatches();
 
         //Apply Physics
         velocity.y += gravity * Time.deltaTime;
@@ -136,10 +139,29 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D other) {
-        if(other.gameObject.layer == LayerMask.NameToLayer("Throwable")) {
+    private void OnDrawGizmos() {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(handTransform.position, catchRadius);
+    }
 
-            Debug.Log(other.gameObject.name);    
+    void CheckCatches() {
+        Throwable[] allThrowables;
+        allThrowables = Object.FindObjectsOfType<Throwable>();
+
+        foreach(Throwable throwable in allThrowables) {
+            if(Vector2.Distance(transform.position, throwable.transform.position) < catchRadius) {
+                throwable.Catch();
+            }
         }
     }
+
+    // private void OnTriggerEnter2D(Collider2D other) {
+    //     if(other.gameObject.layer == LayerMask.NameToLayer("Throwable")) {
+    //         //Catched a throwable
+    //         Throwable throwable = other.gameObject.GetComponent<Throwable>();
+    //         throwable.Catch();
+
+    //         Debug.Log(other.gameObject.name);
+    //     }
+    // }
 }

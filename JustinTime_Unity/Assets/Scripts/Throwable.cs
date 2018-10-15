@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Throwable : MonoBehaviour
 {  
+    SpriteRenderer sprite;
     PlayerMotor motor;
 
     Vector2 velocity;
@@ -27,6 +28,7 @@ public class Throwable : MonoBehaviour
 
     void Start() {
         motor = GetComponent<PlayerMotor>();
+        sprite = GetComponentInChildren<SpriteRenderer>();
         gravity = GameManager.instance.gravity;
     }
 
@@ -65,13 +67,21 @@ public class Throwable : MonoBehaviour
         }
     }
 
+    public void Catch() {
+        TurnOffPhysics();
+    }
+
     void Die() {
-        hitTheGround = true;
-        motor.enabled = false;
-        GetComponent<BoxCollider2D>().enabled = false;
-        GetComponentInChildren<SpriteRenderer>().enabled = false;
+        TurnOffPhysics();
+        sprite.enabled = false;
 
        //Die animation
        blood.Play();
+    }
+
+    void TurnOffPhysics() {
+        hitTheGround = true;
+        motor.enabled = false;
+        GetComponent<BoxCollider2D>().enabled = false;
     }
 }
