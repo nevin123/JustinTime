@@ -14,13 +14,17 @@ public class GameManager : MonoBehaviour
         }    
     }
     #endregion
-
+    
     [Header("World Rules")]
     public float time = 1;
     public float gravity;
 
+    [Header("Score")]
+    public int currentStage;
+    public int currentScore;
+
     [Header("Game States")]
-    public GamePhase[] gamePhases;
+    public GameStage[] gamePhases;
 
     //Hidden
     ObjectThrower[] objectThrowers;
@@ -29,8 +33,42 @@ public class GameManager : MonoBehaviour
         objectThrowers = Object.FindObjectsOfType<ObjectThrower>();
 
         StartThrowing();
+
+        UIManager.instance.SetStageName(gamePhases[0].name);
+        UIManager.instance.SetScoreUI(0,true, true);
     }
 
+    #region Score
+
+    public void Catched(Throwable throwable) {
+        currentScore += throwable.score;
+
+        UIManager.instance.SetScoreUI(Mathf.Clamp01((float)Mathf.Abs(currentScore)/gamePhases[0].scoreThreshold), Mathf.Sign(currentScore) == 1);
+
+        if(currentScore >= gamePhases[currentStage].scoreThreshold) {
+            currentScore = 0;
+            currentStage++;
+            currentStage = Mathf.Clamp(currentStage, 0, gamePhases.Length);
+        }
+    } 
+
+    public void Died(Throwable throwable) {
+        currentScore -= throwable.penalty;
+
+        UIManager.instance.SetScoreUI(Mathf.Clamp01((float)Mathf.Abs(currentScore)/gamePhases[0].scoreThreshold), Mathf.Sign(currentScore) == 1);
+
+        if(currentScore <= -gamePhases[currentStage].scoreThreshold) {
+            GameOver();
+        }
+    }
+
+    public void GameOver() {
+        Debug.Log("GAME OVER !");
+    }
+
+    #endregion
+
+    #region Throwing
     public void StartThrowing() {
         StartCoroutine("Throw");
     }
@@ -41,15 +79,19 @@ public class GameManager : MonoBehaviour
 
     IEnumerator Throw() {
         while(true) {
-            yield return new WaitForSeconds(gamePhases[0].throwInterval);
+            yield return new WaitForSeconds(gamePhases[currentStage].throwInterval);
 
             int throwerIndex = Random.Range(0,objectThrowers.Length);
             objectThrowers[throwerIndex].Throw();
         }
     }
+    #endregion
 }
 
+
 [System.Serializable]
-public class GamePhase {
+public class GameStage {
+    public string name;
+    public int scoreThreshold;
     public float throwInterval;
 }

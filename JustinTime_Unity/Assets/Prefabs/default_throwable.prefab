@@ -1,5 +1,17 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!4 &688542131230294331 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7963668503948700424, guid: 61faea581443f4965a7fd1b110bbc9c7,
+    type: 3}
+  m_PrefabInstance: {fileID: 7424908718603201075}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &688542131230294330 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 7963668503948700425, guid: 61faea581443f4965a7fd1b110bbc9c7,
+    type: 3}
+  m_PrefabInstance: {fileID: 7424908718603201075}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &33497261864977031
 GameObject:
   m_ObjectHideFlags: 0
@@ -79,18 +91,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!4 &688542131230294331 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 7963668503948700424, guid: 61faea581443f4965a7fd1b110bbc9c7,
-    type: 3}
-  m_PrefabInstance: {fileID: 7424908718603201075}
-  m_PrefabAsset: {fileID: 0}
---- !u!198 &688542131230294330 stripped
-ParticleSystem:
-  m_CorrespondingSourceObject: {fileID: 7963668503948700425, guid: 61faea581443f4965a7fd1b110bbc9c7,
-    type: 3}
-  m_PrefabInstance: {fileID: 7424908718603201075}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &6743021442601271837
 GameObject:
   m_ObjectHideFlags: 0
@@ -103,6 +103,7 @@ GameObject:
   - component: {fileID: 8022706403728245081}
   - component: {fileID: 6743021442601271836}
   - component: {fileID: 6743021442601271833}
+  - component: {fileID: 5764956347420139928}
   m_Layer: 10
   m_Name: default_throwable
   m_TagString: Untagged
@@ -138,12 +139,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55d2e69dc864c4e498ce9f440cb42513, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  deadImage: {fileID: 21300000, guid: 6258c2991e92140de93ee4b87766e691, type: 3}
-  pixel: {fileID: 6920568473183582129, guid: 8c956e55929144e7c904117df3468e81, type: 3}
   blood: {fileID: 688542131230294330}
   minThrowVelocity: {x: 1, y: 1}
   maxThrowVelocity: {x: 5, y: 5}
   maxFallingSpeed: 4
+  isCatched: 0
+  isDead: 0
 --- !u!114 &6743021442601271836
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -178,7 +179,7 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: 0.2905057}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -189,8 +190,21 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.01, y: 0.01}
+  m_Size: {x: 0.6, y: 0.6}
   m_EdgeRadius: 0
+--- !u!114 &5764956347420139928
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6743021442601271837}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cef30b92e992a479b91e527665ec2b74, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 0
 --- !u!1001 &7424908718603201075
 PrefabInstance:
   m_ObjectHideFlags: 0

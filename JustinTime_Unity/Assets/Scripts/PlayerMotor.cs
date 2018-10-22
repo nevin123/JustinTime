@@ -10,6 +10,14 @@ public class PlayerMotor : RaycastController
         UpdateRaycastOrigins();
         collisions.Reset();
 
+        if(moveAmount.x != 0) {
+            collisions.previousDirectionX = (int)Mathf.Sign(moveAmount.x);
+        }
+        
+        if(moveAmount.y != 0) {
+            collisions.previousDirectionY = (int)Mathf.Sign(moveAmount.y);
+        }
+
         HorizontalCollisions(ref moveAmount);
         VerticalCollisions(ref moveAmount);
 
@@ -17,7 +25,7 @@ public class PlayerMotor : RaycastController
     }
 
     void VerticalCollisions(ref Vector2 moveAmount) {
-        float directionY = Mathf.Sign(moveAmount.y);
+        float directionY = collisions.previousDirectionY;
         float rayLength = Mathf.Abs(moveAmount.y) + skinWidth;
 
         for(int i = 0; i < verticalRayCount; i++) {
@@ -38,8 +46,8 @@ public class PlayerMotor : RaycastController
     }
 
     void HorizontalCollisions(ref Vector2 moveAmount) {
-        float directionX = Mathf.Sign(moveAmount.x);
-        float rayLength = Mathf.Abs(moveAmount.x) + skinWidth;
+        float directionX = collisions.previousDirectionX;
+        float rayLength = Mathf.Abs(moveAmount.x) + skinWidth * 2;
 
         for(int i = 0; i < horizontalRayCount; i++) {
             Vector2 rayOrigin = (directionX == -1)?raycastOrigins.bottomLeft:raycastOrigins.bottomRight;
@@ -50,7 +58,7 @@ public class PlayerMotor : RaycastController
 
             if(hit) {
                 moveAmount.x = (hit.distance - skinWidth) * directionX;
-                rayLength = hit.distance + skinWidth;
+                rayLength = hit.distance + skinWidth * 2;
 
                 collisions.left = directionX == -1;
                 collisions.right = directionX == 1;
@@ -61,6 +69,8 @@ public class PlayerMotor : RaycastController
     public struct CollisionInfo {
         public bool above, below;
         public bool left, right;
+
+        public int previousDirectionX, previousDirectionY;
 
         public void Reset() {
             above = below = false;

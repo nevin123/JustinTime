@@ -19,6 +19,12 @@ public class PlayerController : MonoBehaviour {
     public Transform handTransform;
     [Range(0.2f, 3)]
     public float catchRadius = 1;
+    public float flyCatchMultimlier = 1.5f;
+    public bool releaseOnGrounded = true;
+    public float dropAfterTime;
+    float dropTimer = 0;
+    float armRadius;
+    ObjectStacker stacker;
 
     [Header("charging")]
     public Vector2 minChargeVelocity;
@@ -34,6 +40,7 @@ public class PlayerController : MonoBehaviour {
     float chargeTimer = 0;
 
     void Start() {
+        stacker = GetComponent<ObjectStacker>();
         motor = GetComponent<PlayerMotor>();
         dustParticles = GetComponentsInChildren<ParticleSystem>();
     }
@@ -67,6 +74,9 @@ public class PlayerController : MonoBehaviour {
 
         //Move
         motor.Move(velocity * Time.deltaTime);
+
+        //Catch
+        armRadius = Mathf.Lerp(catchRadius, catchRadius * flyCatchMultimlier, Mathf.Clamp01(velocity.magnitude/5));
         CheckCatches();
 
         //Apply Physics
@@ -79,18 +89,35 @@ public class PlayerController : MonoBehaviour {
             velocity.x += velocityXDrag * Time.deltaTime;
         }
 
+        //Colliding with ground
         if(motor.collisions.below || motor.collisions.above) {
             velocity.y = 0;
+            Debug.Log("grounded");
+            //particles
             foreach(ParticleSystem dust in dustParticles) {
                 var em = dust.emission;
                 em.enabled = true;
             }
 
         } else {
+            Debug.Log("not grounded");
             foreach(ParticleSystem dust in dustParticles) {
                 var em = dust.emission;
                 em.enabled = false;
             }
+        }
+
+        //Grounded
+        if(velocity.y < 0.01f) {
+            if(releaseOnGrounded) {
+                dropTimer += Time.deltaTime;
+                
+                if(dropTimer > dropAfterTime) {
+                    stacker.ReleaseAllObjects(velocity);
+                }
+            }
+        } else {
+            dropTimer = 0;
         }
     }
 
@@ -141,7 +168,7 @@ public class PlayerController : MonoBehaviour {
 
     private void OnDrawGizmos() {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(handTransform.position, catchRadius);
+        Gizmos.DrawWireSphere(handTransform.position, armRadius);
     }
 
     void CheckCatches() {
@@ -149,19 +176,10 @@ public class PlayerController : MonoBehaviour {
         allThrowables = Object.FindObjectsOfType<Throwable>();
 
         foreach(Throwable throwable in allThrowables) {
-            if(Vector2.Distance(transform.position, throwable.transform.position) < catchRadius) {
+            if(Vector2.Distance(transform.position, throwable.transform.position) < armRadius && !throwable.isCatched && !throwable.isDead) {
                 throwable.Catch();
+                stacker.AddObject(throwable.gameObject);
             }
         }
     }
-
-    // private void OnTriggerEnter2D(Collider2D other) {
-    //     if(other.gameObject.layer == LayerMask.NameToLayer("Throwable")) {
-    //         //Catched a throwable
-    //         Throwable throwable = other.gameObject.GetComponent<Throwable>();
-    //         throwable.Catch();
-
-    //         Debug.Log(other.gameObject.name);
-    //     }
-    // }
 }

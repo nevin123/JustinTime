@@ -10,21 +10,30 @@ public class Throwable : MonoBehaviour
     Vector2 velocity;
 
     [Header("Graphics")]
-    public Sprite deadImage;
-    public GameObject pixel;
     public ParticleSystem blood;
 
     [Header("Throwing")]
     public Vector2 minThrowVelocity;
     public Vector2 maxThrowVelocity;
 
+    [Header("Scores")]
+    public int score = 1;
+    public int penalty = 1;
+
+    [Header("Physics")]
     float gravity;
     
     public float maxFallingSpeed = 5;
     float horizontalDrag = 2;
 
+    [HideInInspector]
+    public bool isCatched = false;
+    [HideInInspector]
+    public bool isDead = false;
+
+    bool isLanded = false;
     bool isThrown = false;
-    bool hitTheGround = false;
+    bool applyPhysics = true;
 
     void Start() {
         motor = GetComponent<PlayerMotor>();
@@ -38,7 +47,7 @@ public class Throwable : MonoBehaviour
     }
 
     void Update() {
-        if(isThrown && !hitTheGround) {
+        if(isThrown && applyPhysics) {
             ApplyPhysics();
         }
     }
@@ -54,34 +63,51 @@ public class Throwable : MonoBehaviour
         if(motor.collisions.left || motor.collisions.right) {
             velocity.x = 0;
         } else {
-            float velocityXDrag = -Mathf.Sign(velocity.x) * Mathf.Clamp01(Mathf.Abs(velocity.x)) * horizontalDrag;
+            float velocityXDrag = -Mathf.Sign(velocity.x) * Mathf.Clamp01(Mathf.Abs(velocity.x)) * ((motor.collisions.below == true)?horizontalDrag*50f:horizontalDrag);
             velocity.x += velocityXDrag * Time.deltaTime;
         }
 
         if(motor.collisions.below || motor.collisions.above) {
             velocity.y = 0;
 
-            if(motor.collisions.below) {
-                Die();
+            if(motor.collisions.below && !isLanded) {
+                isLanded = true;
+
+                if(isCatched) {
+                    //Landed safely
+                    GameManager.instance.Catched(this);
+                    GetComponent<AI>().Landed = true;
+                } else {
+                    //Died
+                    GameManager.instance.Died(this);
+                    Die();
+                }
             }
         }
     }
 
-    public void Catch() {
-        TurnOffPhysics();
+    public void SetVelocity(Vector2 velocity) {
+        this.velocity = velocity;
     }
 
-    void Die() {
-        TurnOffPhysics();
+    public void Catch() {
+        isCatched = true;
+        TogglePhysics(false);
+    }
+
+    public void Die() {
+        TogglePhysics(false);
+        isDead = true;
         sprite.enabled = false;
 
-       //Die animation
-       blood.Play();
+        //Die animation
+        blood.Play();
+
+        GameObject.Destroy(gameObject, 10);
     }
 
-    void TurnOffPhysics() {
-        hitTheGround = true;
-        motor.enabled = false;
-        GetComponent<BoxCollider2D>().enabled = false;
+    public void TogglePhysics(bool tf) {
+        applyPhysics = tf;
+        GetComponent<BoxCollider2D>().enabled = tf;
     }
 }
