@@ -26,16 +26,19 @@ public class GameManager : MonoBehaviour
     [Header("Game States")]
     public GameStage[] gamePhases;
 
+    public GameState gameState;
+
+    UIManager UI;
+
     //Hidden
     ObjectThrower[] objectThrowers;
 
     void Start() {
+        UI = UIManager.instance;
         objectThrowers = Object.FindObjectsOfType<ObjectThrower>();
 
-        StartThrowing();
-
-        UIManager.instance.SetStageName(gamePhases[0].name);
-        UIManager.instance.SetScoreUI(0,true, true);
+        UI.SetStageName(gamePhases[0].name);
+        UI.SetScoreUI(0,true, true);
     }
 
     #region Score
@@ -43,19 +46,21 @@ public class GameManager : MonoBehaviour
     public void Catched(Throwable throwable) {
         currentScore += throwable.score;
 
-        UIManager.instance.SetScoreUI(Mathf.Clamp01((float)Mathf.Abs(currentScore)/gamePhases[0].scoreThreshold), Mathf.Sign(currentScore) == 1);
+        UI.SetScoreUI(Mathf.Clamp01((float)Mathf.Abs(currentScore)/gamePhases[currentStage].scoreThreshold), Mathf.Sign(currentScore) == 1);
 
         if(currentScore >= gamePhases[currentStage].scoreThreshold) {
+            //Next stage
             currentScore = 0;
             currentStage++;
-            currentStage = Mathf.Clamp(currentStage, 0, gamePhases.Length);
+            currentStage = Mathf.Clamp(currentStage, 0, gamePhases.Length-1);
+            UI.SetStageName(gamePhases[currentStage].name);
         }
     } 
 
     public void Died(Throwable throwable) {
         currentScore -= throwable.penalty;
 
-        UIManager.instance.SetScoreUI(Mathf.Clamp01((float)Mathf.Abs(currentScore)/gamePhases[0].scoreThreshold), Mathf.Sign(currentScore) == 1);
+        UI.SetScoreUI(Mathf.Clamp01((float)Mathf.Abs(currentScore)/gamePhases[currentStage].scoreThreshold), Mathf.Sign(currentScore) == 1);
 
         if(currentScore <= -gamePhases[currentStage].scoreThreshold) {
             GameOver();
@@ -64,16 +69,29 @@ public class GameManager : MonoBehaviour
 
     public void GameOver() {
         Debug.Log("GAME OVER !");
+
+        StopCoroutine("Throw");
     }
 
     #endregion
 
     #region Throwing
-    public void StartThrowing() {
+    public void StartGame() {
+        //Reset Score
+        UI.SetStageName(gamePhases[0].name);
+        UI.SetScoreUI(0,true, true);
+
+        //Hide Main Menu
+        UI.ShowHideMainMenu(false);
+
         StartCoroutine("Throw");
     }
 
-    public void StopThrowing() {
+    public void PauseGame() {
+
+    }
+
+    public void StopGame() {
         StopCoroutine("Throw");
     }
 
@@ -94,4 +112,11 @@ public class GameStage {
     public string name;
     public int scoreThreshold;
     public float throwInterval;
+}
+
+public enum GameState {
+    InMainMenu,
+    Playing,
+    Paused,
+    GameOver
 }

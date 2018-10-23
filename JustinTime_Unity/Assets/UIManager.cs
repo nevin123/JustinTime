@@ -14,6 +14,8 @@ public class UIManager : MonoBehaviour
     }
     #endregion
 
+    [Header("UI Menus")]
+    public MainMenuController mainMenuController;
     public GameplayUIController gameplayMenuController;
 
     public void SetScoreUI (float percentage, bool positive, bool instant = false) {
@@ -22,5 +24,13 @@ public class UIManager : MonoBehaviour
 
     public void SetStageName(string name) {
         gameplayMenuController.SetStageName(name);
+    }
+
+    public void ShowHideMainMenu(bool tf) {
+        if(tf) {
+            mainMenuController.Show();
+        } else {
+            mainMenuController.Hide();
+        }
     }
 }

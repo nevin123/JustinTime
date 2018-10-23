@@ -20,6 +20,20 @@ public class GameplayUIController : MonoBehaviour
     private void Update() {
         progressBar.fillAmount = Mathf.SmoothDamp(progressBar.fillAmount, scorePercentage, ref scorePercentageVel, progressBarSmoothing, 1);
         gameOverProgressBar.fillAmount = Mathf.SmoothDamp(gameOverProgressBar.fillAmount, negativeScorePercentage, ref negativeScorePercentageVel, progressBarSmoothing, 1);
+
+        Debug.Log(progressBar.fillAmount);
+        if(progressBar.fillAmount >= 0.98f) {
+            //ProgressBar Full
+            Debug.Log("Dsadsadas");
+            progressBar.fillAmount = 0;
+            scorePercentage = 0;
+            scorePercentageVel = 0;
+        }
+
+        if(gameOverProgressBar.fillAmount >= 0.98f) {
+            //GameOverBar Full
+            // Do gameover effect
+        }
     }
 
     public void SetScorePercentage(float percentage, bool positive, bool instant = false) {
