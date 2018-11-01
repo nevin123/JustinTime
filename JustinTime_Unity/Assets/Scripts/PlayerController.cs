@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour {
     Vector2 velocity;
 
     ParticleSystem[] dustParticles;
+    public ScreenShake screenShakeController;
 
     [Header("Physics")]
     public float gravity = -9.81f;
@@ -38,6 +39,8 @@ public class PlayerController : MonoBehaviour {
     int currentInputDirection = 0;
     float chargeStrength = 0;
     float chargeTimer = 0;
+    
+    bool notgrounded = true;
 
     void Start() {
         stacker = GetComponent<ObjectStacker>();
@@ -109,6 +112,10 @@ public class PlayerController : MonoBehaviour {
 
         //Grounded
         if(velocity.y < 0.01f) {
+            if(notgrounded) {
+                notgrounded = false;
+            }
+
             if(releaseOnGrounded) {
                 dropTimer += Time.deltaTime;
                 
@@ -118,6 +125,7 @@ public class PlayerController : MonoBehaviour {
             }
         } else {
             dropTimer = 0;
+            notgrounded = true;
         }
     }
 
@@ -154,7 +162,8 @@ public class PlayerController : MonoBehaviour {
                 newVelocity.x *= chargeDirection;
                 
                 velocity = newVelocity;
-                
+                screenShakeController.ShakeToDirection(newVelocity.normalized * -1f, newVelocity.magnitude * 0.02f, 1f*newVelocity.magnitude);
+
                 chargeTimer = 0;
                 isCharging = false;
                 chargeDirection = 0;
