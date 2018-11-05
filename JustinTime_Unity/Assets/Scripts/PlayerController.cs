@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour {
 
     ParticleSystem[] dustParticles;
     public ScreenShake screenShakeController;
+    public Transform cape;
 
     [Header("Physics")]
     public float gravity = -9.81f;
@@ -41,6 +42,8 @@ public class PlayerController : MonoBehaviour {
     float chargeTimer = 0;
     
     bool notgrounded = true;
+    float lastRandomShake = 0;
+    bool doRandomShake = true;
 
     void Start() {
         stacker = GetComponent<ObjectStacker>();
@@ -70,6 +73,17 @@ public class PlayerController : MonoBehaviour {
         if(isCharging) {
             chargeTimer += Time.deltaTime;
             
+            //Charge shake
+            if(doRandomShake == false && (chargeTimer - lastRandomShake)>0) {
+                doRandomShake = true;
+                lastRandomShake += 0.2f;
+            } 
+            if(doRandomShake) {
+                screenShakeController.ShakeRandom(chargeTimer/maxChargeTime * 0.03f, 0.2f);
+                doRandomShake = false;
+            }
+
+            //Do Charge after the max charge time is complete
             if(chargeTimer >= maxChargeTime) {
                 StartCoroutine("Charge");
             }
@@ -94,8 +108,18 @@ public class PlayerController : MonoBehaviour {
 
         //Colliding with ground
         if(motor.collisions.below || motor.collisions.above) {
-            velocity.y = 0;
             Debug.Log("grounded");
+
+            if(notgrounded) {
+                notgrounded = false;
+                Debug.Log("grounded shake : " + velocity.magnitude);
+                screenShakeController.ShakeZoom(0.99f, 0.1f);
+            }
+            
+            cape.rotation = Quaternion.Lerp(cape.rotation, Quaternion.identity, Time.deltaTime * 5f);
+            
+            velocity.y = 0;
+
             //particles
             foreach(ParticleSystem dust in dustParticles) {
                 var em = dust.emission;
@@ -104,18 +128,22 @@ public class PlayerController : MonoBehaviour {
 
         } else {
             Debug.Log("not grounded");
+
+            Debug.Log(velocity);
+            
+
+            cape.rotation = Quaternion.Lerp(cape.rotation, Quaternion.Euler(0,0,-Mathf.Sign(velocity.x) * Vector2.Angle(Vector2.down,velocity)), Time.deltaTime * 5f);
+
             foreach(ParticleSystem dust in dustParticles) {
                 var em = dust.emission;
                 em.enabled = false;
             }
+
+            notgrounded = true;
         }
 
         //Grounded
         if(velocity.y < 0.01f) {
-            if(notgrounded) {
-                notgrounded = false;
-            }
-
             if(releaseOnGrounded) {
                 dropTimer += Time.deltaTime;
                 
@@ -125,7 +153,7 @@ public class PlayerController : MonoBehaviour {
             }
         } else {
             dropTimer = 0;
-            notgrounded = true;
+            
         }
     }
 
@@ -158,17 +186,24 @@ public class PlayerController : MonoBehaviour {
         while(isCharging == true) {
             if(motor.collisions.below) {
                 
+                //calculate charge velocity
                 Vector2 newVelocity = Vector2.Lerp(minChargeVelocity, maxChargeVelocity, chargePower.Evaluate(chargeTimer/maxChargeTime));
                 newVelocity.x *= chargeDirection;
                 
+                //apply velocity and do screenshake
                 velocity = newVelocity;
                 screenShakeController.ShakeToDirection(newVelocity.normalized * -1f, newVelocity.magnitude * 0.02f, 1f*newVelocity.magnitude);
 
+                //Charge info reset
                 chargeTimer = 0;
                 isCharging = false;
                 chargeDirection = 0;
                 currentInputDirection = 0;
                 chargeStrength = 0;
+
+                //Charge shake reset
+                doRandomShake = true;
+                lastRandomShake = 0;
             }
 
             yield return null;

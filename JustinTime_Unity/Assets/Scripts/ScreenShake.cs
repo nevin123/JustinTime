@@ -1,19 +1,30 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class ScreenShake : MonoBehaviour
 {
+    Camera cam;
+    float orthographicSize;
+
+    private void Start() {
+        cam = Camera.main; 
+        orthographicSize = cam.orthographicSize;   
+    }
+
     public void ShakeToDirection(Vector2 dir, float intensity, float speed) {
         StartCoroutine(ShakeToDirectionAnimation(dir,intensity,speed));
     }
 
     public void ShakeZoom(float zoomAmount, float speed) {
-        StartCoroutine(ShakeZoomAnimation(zoomAmount, speed));
+        this.cam.DOOrthoSize(orthographicSize * zoomAmount, speed * 0.6f).OnComplete(()=>{
+            this.cam.DOOrthoSize(orthographicSize, speed * 0.4f);
+        });
     }
 
     public void ShakeRandom(float intensity, float duration){
-
+        cam.DOShakePosition(duration, intensity, 10, 30, false);
     }
 
     IEnumerator ShakeToDirectionAnimation(Vector2 dir, float intensity, float speed) {
@@ -33,29 +44,6 @@ public class ScreenShake : MonoBehaviour
                 if(Vector2.Distance(transform.position, Vector2.zero)<0.01f) {
                     transform.position = Vector2.zero;
                     done = true;
-                }
-            }
-
-            yield return new WaitForEndOfFrame();
-        }
-    }
-
-    IEnumerator ShakeZoomAnimation(float zoomAmount, float speed) {
-        Debug.Log("start shake");
-        bool done = false;
-        bool start = true;
-        
-        while(done == false) {
-            if(start) {
-                transform.localScale = Vector3.Lerp(transform.localScale, Vector3.one*zoomAmount, speed * Time.deltaTime);
-                if(Mathf.Abs(transform.localScale.x - 1f*zoomAmount) < 0.03f) {
-                    start = false;
-                }
-            } else {
-                transform.localScale = Vector3.Lerp(transform.localScale, Vector2.one, speed * Time.deltaTime);
-                if(Mathf.Abs(transform.localScale.x - 1f) < 0.03f) {
-                    transform.localScale = Vector3.one;
-                    done = false;
                 }
             }
 
