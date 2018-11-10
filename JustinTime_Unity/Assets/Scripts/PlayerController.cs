@@ -132,7 +132,7 @@ public class PlayerController : MonoBehaviour {
             Debug.Log(velocity);
             
 
-            cape.rotation = Quaternion.Lerp(cape.rotation, Quaternion.Euler(0,0,-Mathf.Sign(velocity.x) * Vector2.Angle(Vector2.down,velocity)), Time.deltaTime * 5f);
+            cape.rotation = Quaternion.Lerp(cape.rotation, Quaternion.Euler(0,0,-Mathf.Sign(velocity.x) * Vector2.Angle(Vector2.down,velocity)), Time.deltaTime * velocity.magnitude*0.3f);
 
             foreach(ParticleSystem dust in dustParticles) {
                 var em = dust.emission;
