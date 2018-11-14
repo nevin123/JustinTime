@@ -108,11 +108,10 @@ public class PlayerController : MonoBehaviour {
 
         //Colliding with ground
         if(motor.collisions.below || motor.collisions.above) {
-            Debug.Log("grounded");
+            // Debug.Log("grounded");
 
             if(notgrounded) {
                 notgrounded = false;
-                Debug.Log("grounded shake : " + velocity.magnitude);
                 screenShakeController.ShakeZoom(0.99f, 0.1f);
             }
             
@@ -127,10 +126,7 @@ public class PlayerController : MonoBehaviour {
             }
 
         } else {
-            Debug.Log("not grounded");
-
-            Debug.Log(velocity);
-            
+            // Debug.Log("not grounded");
 
             cape.rotation = Quaternion.Lerp(cape.rotation, Quaternion.Euler(0,0,-Mathf.Sign(velocity.x) * Vector2.Angle(Vector2.down,velocity)), Time.deltaTime * velocity.magnitude*0.3f);
 

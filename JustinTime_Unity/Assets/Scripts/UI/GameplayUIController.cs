@@ -21,7 +21,6 @@ public class GameplayUIController : MonoBehaviour
         progressBar.fillAmount = Mathf.SmoothDamp(progressBar.fillAmount, scorePercentage, ref scorePercentageVel, progressBarSmoothing, 1);
         gameOverProgressBar.fillAmount = Mathf.SmoothDamp(gameOverProgressBar.fillAmount, negativeScorePercentage, ref negativeScorePercentageVel, progressBarSmoothing, 1);
 
-        Debug.Log(progressBar.fillAmount);
         if(progressBar.fillAmount >= 0.98f) {
             //ProgressBar Full
             Debug.Log("Dsadsadas");

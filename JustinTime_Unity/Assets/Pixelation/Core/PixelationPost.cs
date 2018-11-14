@@ -6,7 +6,7 @@ public class PixelationPost : MonoBehaviour
 {
     public Shader _shader;
 
-	[Range(0.0001f, 100.0f)]
+	[Range(0.0001f, 3.0f)]
     public float _cellSize = 0.025f;
 
     [Range(0, 8)]

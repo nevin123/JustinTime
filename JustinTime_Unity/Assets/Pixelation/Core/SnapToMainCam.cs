@@ -22,7 +22,7 @@ public class SnapToMainCam : MonoBehaviour {
 		{
 			return;
 		}
-		thisCam.clearFlags = CameraClearFlags.Nothing;
+		// thisCam.clearFlags = CameraClearFlags.Nothing;
         thisCam.projectionMatrix = mainCam.projectionMatrix;
 		thisCam.orthographic = mainCam.orthographic;
 		thisCam.orthographicSize = mainCam.orthographicSize;

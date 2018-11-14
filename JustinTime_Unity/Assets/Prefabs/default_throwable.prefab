@@ -106,7 +106,7 @@ GameObject:
   - component: {fileID: 5764956347420139928}
   m_Layer: 10
   m_Name: default_throwable
-  m_TagString: Untagged
+  m_TagString: NormalThrowable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -142,6 +142,8 @@ MonoBehaviour:
   blood: {fileID: 688542131230294330}
   minThrowVelocity: {x: 1, y: 1}
   maxThrowVelocity: {x: 5, y: 5}
+  score: 1
+  penalty: 1
   maxFallingSpeed: 4
   isCatched: 0
   isDead: 0

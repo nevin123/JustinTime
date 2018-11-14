@@ -4,20 +4,16 @@ using UnityEngine;
 
 public class ObjectThrower : MonoBehaviour
 {
-    public Throwable throwables;
-    int faceDir;
+    public Throwable[] throwables;
 
-    void Start() {
-        faceDir = (int)Mathf.Sign(-transform.position.x);
+    public virtual void Start() {
+        
     }
     
-    public void Throw() {
-        GameObject newThrowableObject = Instantiate(throwables.gameObject, transform.position, Quaternion.identity);
+    public virtual void Throw() {
+        GameObject newThrowableObject = Instantiate(throwables[0].gameObject, transform.position, Quaternion.identity);
         Throwable throwable = newThrowableObject.GetComponent<Throwable>();
 
-        Vector2 throwVelocity = Vector2.Lerp(throwable.minThrowVelocity, throwable.maxThrowVelocity, Random.Range(0f,1f));
-        throwVelocity.x *= faceDir;
-
-        throwable.Throw(throwVelocity);
+        throwable.Throw(Vector2.zero);
     }
 }
