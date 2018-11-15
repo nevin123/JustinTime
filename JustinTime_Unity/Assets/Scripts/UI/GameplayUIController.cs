@@ -23,7 +23,6 @@ public class GameplayUIController : MonoBehaviour
 
         if(progressBar.fillAmount >= 0.98f) {
             //ProgressBar Full
-            Debug.Log("Dsadsadas");
             progressBar.fillAmount = 0;
             scorePercentage = 0;
             scorePercentageVel = 0;

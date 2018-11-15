@@ -44,6 +44,8 @@ public class Throwable : MonoBehaviour
     public void Throw(Vector2 velocity) {
         isThrown = true;
         this.velocity = velocity;
+
+        Telegrapher.instance.AddNewObjectToFollow(gameObject);
     }
 
     void Update() {
